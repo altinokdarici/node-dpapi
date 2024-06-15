@@ -28,7 +28,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm run build -- --arch ${{ matrix.arch }}
+        run: npm run build -- --verbose --arch ${{ matrix.arch }}
 
       - name: Run tests
         run: npm test

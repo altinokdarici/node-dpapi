@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "install": "exit 0",
-    "build": "node-gyp rebuild",
+    "build": "node-gyp clean configure build",
     "test": "node test.js"
   },
   "keywords": [
