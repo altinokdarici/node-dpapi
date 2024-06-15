@@ -20,29 +20,32 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         if: matrix.arch == 'ia32'
         uses: actions/setup-node@v4
         with:
           architecture: 'x86'
+          node-version: '20'
 
       - name: Setup Node.js
         if: matrix.arch != 'ia32'
         uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Build
+      - name: Build
         run: npm run build -- --verbose --arch ${{ matrix.arch }}
 
-      - name: Run tests
+      - name: Test
         run: npm test
       
       - name: Upload package artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: node-binary-${{ matrix.arch }}
           path: '**/*.node'
