@@ -21,7 +21,7 @@ jobs:
       - name: Download package artifact
         uses: actions/download-artifact@v2
         with:
-          name: node-binary
+          name: node-binary-x64
           path: ./build/Release
 
       - name: Test
