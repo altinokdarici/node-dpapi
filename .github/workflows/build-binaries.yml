@@ -17,17 +17,25 @@ jobs:
       matrix:
         arch: [x64, ia32]
 
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Setup Node.js
+        if: matrix.arch == 'ia32'
+        uses: actions/setup-node@v4
+        with:
+          architecture: 'x86'
+
+      - name: Setup Node.js
+        if: matrix.arch != 'ia32'
         uses: actions/setup-node@v4
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Run tests
+      - name: Run Build
         run: npm run build -- --verbose --arch ${{ matrix.arch }}
 
       - name: Run tests
