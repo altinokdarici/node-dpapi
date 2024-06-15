@@ -25,6 +25,6 @@ jobs:
         uses: actions/setup-node@v3
       
       - name: Publish package to npm
-        run: npm publish artifact-directory/*.tgz --provenance --access public
+        run: npm publish artifact-directory/*.tgz --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
