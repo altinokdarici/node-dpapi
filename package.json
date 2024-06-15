@@ -4,6 +4,8 @@
   "description": "Node native module to encrypt/decrypt data. On Windows, it uses DPAPI",
   "main": "index.js",
   "scripts": {
+    "install": "exit 0",
+    "build": "node-gyp rebuild",
     "test": "node test.js"
   },
   "keywords": [
