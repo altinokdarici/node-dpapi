@@ -1,0 +1,26 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./build.yml
+
+  release:
+    needs: build
+    environment: production
+    runs-on: windows-latest
+    steps:
+      - name: Download package artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: npm-package
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      
+      - name: Publish package to npm
+        run: npm publish *.tgz
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

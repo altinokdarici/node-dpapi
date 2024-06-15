@@ -21,3 +21,13 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Pack npm package
+        run: npm pack
+        id: pack
+      
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: npm-package
+          path: '*.tgz'

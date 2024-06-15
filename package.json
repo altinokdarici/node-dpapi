@@ -1,5 +1,5 @@
 {
-  "name": "node-dpapi2",
+  "name": "node-dpapi",
   "version": "1.0.5",
   "description": "Node native module to encrypt/decrypt data. On Windows, it uses DPAPI",
   "main": "index.js",
