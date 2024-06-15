@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bradhugh/select-client-cert.git"
+    "url": "https://github.com/bradhugh/node-dpapi.git"
   },
   "dependencies": {
     "bindings": "^1.5.0",

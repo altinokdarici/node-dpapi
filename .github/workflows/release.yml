@@ -17,6 +17,9 @@ jobs:
         with:
           name: npm-package
           path: ./artifact-directory
+
+      - name: List files in the artifact directory
+        run: dir artifact-directory
       
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -24,6 +27,6 @@ jobs:
           node-version: '14'
       
       - name: Publish package to npm
-        run: npm publish artifact-directory/*.tgz
+        run: npm publish artifact-directory/*.tgz --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
