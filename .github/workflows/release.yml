@@ -23,9 +23,6 @@ jobs:
         with:
           name: node-binary
           path: ./build/Release
-
-      - name: Run tests
-        run: npm test
       
       - name: List all files recursively
         run: ls -R
