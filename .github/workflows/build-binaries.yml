@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        arch: [x64, arm64, ia32]
+        arch: [x64, ia32]
 
     steps:
       - name: Checkout code
