@@ -35,10 +35,8 @@ jobs:
           node-version: '18'
 
       - name: Configure architecture
-        run: |
-          if [ "${{ matrix.arch }}" == "arm64" ]; then
-            npm config set target_arch arm64
-          fi
+        if: matrix.arch == 'arm64'
+        run: npm config set target_arch arm64
 
       - name: Install dependencies
         run: npm ci
