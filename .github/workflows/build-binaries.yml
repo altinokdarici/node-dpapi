@@ -38,7 +38,10 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build -- --arch ${{ matrix.arch }}
+        run: |
+          npm run build -- --arch ${{ matrix.arch }}
+          mkdir -p bin/${{ matrix.arch }}
+          cp build/Release/*.node bin/${{ matrix.arch }}
 
       - name: Test
         if: matrix.arch != 'arm64'
