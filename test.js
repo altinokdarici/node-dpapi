@@ -1,4 +1,4 @@
-const dpapi = require('./index');
+import dpapi from './index';
 
 const entropy = Buffer.from("AHHH!H!H!H!!!!", "utf-8");
 

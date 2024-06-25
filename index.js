@@ -1,5 +1,4 @@
 const fs = require('fs');
-const path = require('path');
 
 const unsupportedDpapi = {
     protectData() {
@@ -34,6 +33,7 @@ function getDpapi() {
 }
 
 const dpapi = getDpapi();
+
 
 module.exports.protectData = dpapi.protectData;
 module.exports.unprotectData = dpapi.unprotectData;
