@@ -28,19 +28,19 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-binary-x64
-          path: ./bin/x64
+          path: .
 
       - name: Download package artifact for ia32
         uses: actions/download-artifact@v4
         with:
           name: node-binary-ia32
-          path: ./bin/ia32
+          path: .
 
       - name: Download package artifact for arm64
         uses: actions/download-artifact@v4
         with:
           name: node-binary-arm64
-          path: ./bin/arm64
+          path: .
 
       - name: Publish package to npm
         run: |
