@@ -2,4 +2,4 @@
 build/**
 !build/**/*.node
 .github/
-bindings.gyp
+binding.gyp
