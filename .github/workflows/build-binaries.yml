@@ -15,8 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        arch: [x64, ia32]
-
+        arch: [x64, ia32, arm64]
 
     steps:
       - name: Checkout code
@@ -39,7 +38,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build -- --verbose --arch ${{ matrix.arch }}
+        run: npm run build -- --arch ${{ matrix.arch }}
 
       - name: Test
         run: npm test
