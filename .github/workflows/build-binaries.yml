@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js for ia32
         if: matrix.arch == 'ia32'
         uses: actions/setup-node@v4
         with:
@@ -33,10 +33,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-
-      - name: Configure architecture
-        if: matrix.arch == 'arm64'
-        run: npm config set target_arch arm64
 
       - name: Install dependencies
         run: npm ci
