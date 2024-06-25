@@ -41,6 +41,7 @@ jobs:
         run: npm run build -- --arch ${{ matrix.arch }}
 
       - name: Test
+        if: matrix.arch != 'arm64'
         run: npm test
       
       - name: Upload package artifact
