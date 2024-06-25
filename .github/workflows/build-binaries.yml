@@ -36,7 +36,7 @@ jobs:
 
       - name: Configure architecture
         run: |
-          if [ "${{ matrix.architecture }}" == "arm64" ]; then
+          if [ "${{ matrix.arch }}" == "arm64" ]; then
             npm config set target_arch arm64
           fi
 
