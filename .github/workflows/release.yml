@@ -9,7 +9,7 @@ jobs:
 
   release:
     needs: build
-    environment: production
+    environment: Production
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
