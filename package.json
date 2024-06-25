@@ -1,6 +1,6 @@
 {
   "name": "altinok-node-dpapi-2",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Node native module to encrypt/decrypt data. On Windows, it uses DPAPI",
   "main": "index.js",
   "scripts": {
