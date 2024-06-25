@@ -1,4 +1,4 @@
-declare module "node-dpapi2" {
+declare module "node-dpapi-prebuilt" {
     function protectData(
         userData: Uint8Array,
         optionalEntropy: Uint8Array | null,
