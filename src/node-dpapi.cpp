@@ -26,33 +26,26 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 		return;
 	}
 
-	if (info[2].IsNull() || info[2].IsUndefined() || !info[2].IsTypedArray() || info[2].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
+	if (info[2].IsNull() || info[2].IsUndefined() || !info[2].IsString())
 	{
 		Napi::Error::New(env, "Third argument, scope, must be a string").ThrowAsJavaScriptException();
 		return;
 	}
 
 	DWORD flags = 0;
-	if (!info[2].IsNull() && !info[2].IsUndefined())
+
+	std::string scope = info[2].As<Napi::String>().Utf8Value();
+	if (stricmp(scope.c_str(), "LocalMachine") == 0)
 	{
-		Napi::String strData(env, isolate, info[2]);
-		std::string scope(*strData);
-		if (stricmp(scope.c_str(), "LocalMachine") == 0)
-		{
-			flags = CRYPTPROTECT_LOCAL_MACHINE;
-		}
+		flags = CRYPTPROTECT_LOCAL_MACHINE;
 	}
 
 	auto buffer = info[0].As<Napi::Buffer<char>>().Data();
 	auto len = info[0].As<Napi::Buffer<char>>().Length();
 
 	DATA_BLOB entropyBlob;
-	entropyBlob.pbData = nullptr;
-	if (!info[1].IsNull())
-	{
-		entropyBlob.pbData = reinterpret_cast<BYTE *>(info[1].As<Napi::Buffer<char>>().Data());
-		entropyBlob.cbData = info[1].As<Napi::Buffer<char>>().Length();
-	}
+	entropyBlob.pbData = reinterpret_cast<BYTE *>(info[1].As<Napi::Buffer<char>>().Data());
+	entropyBlob.cbData = info[1].As<Napi::Buffer<char>>().Length();
 
 	DATA_BLOB dataIn;
 	DATA_BLOB dataOut;
