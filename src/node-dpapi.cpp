@@ -108,15 +108,15 @@ Napi::Value unprotectData(const Napi::CallbackInfo &info)
 
 Napi::Object init(Napi::Env env, Napi::Object exports)
 {
-	(
-		target)
-		.Set(Napi::String::New(env, "protectData"),
-			 Napi::GetFunction(Napi::Function::New(env, protectData)));
+	Napi::Object target(env, Napi::Object::New(env));
 
-	(
-		target)
-		.Set(Napi::String::New(env, "unprotectData"),
-			 Napi::GetFunction(Napi::Function::New(env, unprotectData)));
+	target.Set(Napi::String::New(env, "protectData"),
+			   Napi::GetFunction(Napi::Function::New(env, protectData)));
+
+	target.Set(Napi::String::New(env, "unprotectData"),
+			   Napi::GetFunction(Napi::Function::New(env, unprotectData)));
+
+	return target;
 }
 
 NODE_API_MODULE(binding, init)
