@@ -20,6 +20,6 @@
     "url": "git+https://github.com/altinokdarici/node-dpapi.git"
   },
   "dependencies": {
-    "nan": "^2.20.0"
+    "node-addon-api": "^8.0.0"
   }
 }

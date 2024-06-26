@@ -1,45 +1,34 @@
-#include <node.h>
-#include <nan.h>
+#include <napi.h>
+#include <uv.h>
 #include <Windows.h>
 #include <dpapi.h>
 #include <functional>
 
-v8::Local<v8::String> CreateUtf8String(v8::Isolate* isolate, char* strData)
+void ProtectDataCommon(bool protect, const Napi::CallbackInfo& info)
 {
-	return v8::String::NewFromUtf8(isolate, strData, v8::NewStringType::kNormal).ToLocalChecked();
-}
-
-void ProtectDataCommon(bool protect, Nan::NAN_METHOD_ARGS_TYPE info)
-{
-	v8::Isolate* isolate = info.GetIsolate();
-
 	if (info.Length() != 3) {
-		isolate->ThrowException(v8::Exception::RangeError(
-			CreateUtf8String(isolate, "3 arguments are required")));
+		Napi::Error::New(env, "3 arguments are required").ThrowAsJavaScriptException();
 	}
 
-	if (info[0]->IsNullOrUndefined() || !info[0]->IsUint8Array())
+	if (info[0].IsNullOrUndefined() || !info[0].IsUint8Array())
 	{
-		isolate->ThrowException(v8::Exception::TypeError(
-			CreateUtf8String(isolate, "First argument, data, must be a valid Uint8Array")));
+		Napi::Error::New(env, "First argument, data, must be a valid Uint8Array").ThrowAsJavaScriptException();
 	}
 
-	if (!info[1]->IsNull() && !info[1]->IsUint8Array())
+	if (!info[1].IsNull() && !info[1].IsUint8Array())
 	{
-		isolate->ThrowException(v8::Exception::TypeError(
-			CreateUtf8String(isolate, "Second argument, optionalEntropy, must be null or an ArrayBuffer")));
+		Napi::Error::New(env, "Second argument, optionalEntropy, must be null or an ArrayBuffer").ThrowAsJavaScriptException();
 	}
 
-	if (info[2]->IsNullOrUndefined() || !info[2]->IsString())
+	if (info[2].IsNullOrUndefined() || !info[2].IsString())
 	{
-		isolate->ThrowException(v8::Exception::TypeError(
-			CreateUtf8String(isolate, "Third argument, scope, must be a string")));
+		Napi::Error::New(env, "Third argument, scope, must be a string").ThrowAsJavaScriptException();
 	}
 
 	DWORD flags = 0;
-	if (!info[2]->IsNullOrUndefined())
+	if (!info[2].IsNullOrUndefined())
 	{
-		v8::String::Utf8Value strData(isolate, info[2]);
+		Napi::String strData(env, isolate, info[2]);
 		std::string scope(*strData);
 		if (stricmp(scope.c_str(), "LocalMachine") == 0)
 		{
@@ -47,15 +36,15 @@ void ProtectDataCommon(bool protect, Nan::NAN_METHOD_ARGS_TYPE info)
 		}
 	}
 
-	auto buffer = node::Buffer::Data(info[0]);
-	auto len = node::Buffer::Length(info[0]);
+	auto buffer = info[0].As<Napi::Buffer<char>>().Data();
+	auto len = info[0].As<Napi::Buffer<char>>().Length();
 
 	DATA_BLOB entropyBlob;
 	entropyBlob.pbData = nullptr;
-	if (!info[1]->IsNull())
+	if (!info[1].IsNull())
 	{
-		entropyBlob.pbData = reinterpret_cast<BYTE*>(node::Buffer::Data(info[1]));
-		entropyBlob.cbData = node::Buffer::Length(info[1]);
+		entropyBlob.pbData = reinterpret_cast<BYTE*>(info[1].As<Napi::Buffer<char>>().Data());
+		entropyBlob.cbData = info[1].As<Napi::Buffer<char>>().Length();
 	}
 
 	DATA_BLOB dataIn;
@@ -94,42 +83,37 @@ void ProtectDataCommon(bool protect, Nan::NAN_METHOD_ARGS_TYPE info)
 	if (!success)
 	{
 		DWORD errorCode = GetLastError();
-		isolate->ThrowException(v8::Exception::Error(
-			CreateUtf8String(isolate, "Decryption failed. TODO: Error code")));
-
-		return;
+		Napi::Error::New(env, "Decryption failed. Error code:" + errorCode).ThrowAsJavaScriptException();
 	}
 
 	// Copy and free the buffer
-	auto returnBuffer = Nan::CopyBuffer(reinterpret_cast<const char*>(dataOut.pbData), dataOut.cbData).ToLocalChecked();
+	auto returnBuffer = Napi::Buffer::Copy(env, reinterpret_cast<const char*>(dataOut.pbData), dataOut.cbData);
 	LocalFree(dataOut.pbData);
 
-	info.GetReturnValue().Set(returnBuffer);
+	return returnBuffer;
 }
 
 // public unsafe static byte[] Protect(byte[] userData, byte[] optionalEntropy, DataProtectionScope scope) 
-NAN_METHOD(protectData)
+Napi::Value protectData(const Napi::CallbackInfo& info)
 {
 	ProtectDataCommon(true, info);
 }
 
 // public unsafe static byte[] Unprotect(byte[] encryptedData, byte[] optionalEntropy, DataProtectionScope scope)
-NAN_METHOD(unprotectData)
+Napi::Value unprotectData(const Napi::CallbackInfo& info)
 {
 	ProtectDataCommon(false, info);
 }
 
-NAN_MODULE_INIT(init)
+Napi::Object init(Napi::Env env, Napi::Object exports)
 {
-	Nan::Set(
-		target,
-		Nan::New<v8::String>("protectData").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<v8::FunctionTemplate>(protectData)).ToLocalChecked());
+	(
+		target).Set(Napi::String::New(env, "protectData"),
+		Napi::GetFunction(Napi::Function::New(env, protectData)));
 
-	Nan::Set(
-		target,
-		Nan::New<v8::String>("unprotectData").ToLocalChecked(),
-		Nan::GetFunction(Nan::New<v8::FunctionTemplate>(unprotectData)).ToLocalChecked());
+	(
+		target).Set(Napi::String::New(env, "unprotectData"),
+		Napi::GetFunction(Napi::Function::New(env, unprotectData)));
 }
 
-NODE_MODULE(binding, init)
+NODE_API_MODULE(binding, init)
