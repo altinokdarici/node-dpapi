@@ -3,34 +3,36 @@
 #include <Windows.h>
 #include <dpapi.h>
 #include <functional>
+#include <iostream> // Include for std::cout
 
-void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
+
+Napi::Value ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 {
 	Napi::Env env = info.Env();
 
 	if (info.Length() != 3)
 	{
 		Napi::Error::New(env, "3 arguments are required").ThrowAsJavaScriptException();
-		return;
+		return env.Null();
 	}
 
 	if (info[0].IsNull() || info[0].IsUndefined() || !info[0].IsTypedArray() || info[0].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
 	{
 		Napi::Error::New(env, "First argument, data, must be a valid Uint8Array").ThrowAsJavaScriptException();
-		return;
+		return env.Null();
 	}
 
-	if (info[1].IsNull() || info[1].IsUndefined() || !info[1].IsTypedArray() || info[1].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
+	if (!info[1].IsNull() && !info[1].IsTypedArray() && info[1].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
 	{
 		Napi::Error::New(env, "Second argument, optionalEntropy, must be null or an ArrayBuffer").ThrowAsJavaScriptException();
-		return;
+		return env.Null();
 	}
 
 	if (info[2].IsNull() || info[2].IsUndefined() || !info[2].IsString())
 	{
 		Napi::Error::New(env, "Third argument, scope, must be a string").ThrowAsJavaScriptException();
-		return;
-	}
+		return env.Null();
+	}   
 
 	DWORD flags = 0;
 
@@ -44,8 +46,11 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 	auto len = info[0].As<Napi::Buffer<char>>().Length();
 
 	DATA_BLOB entropyBlob;
-	entropyBlob.pbData = reinterpret_cast<BYTE *>(info[1].As<Napi::Buffer<char>>().Data());
-	entropyBlob.cbData = info[1].As<Napi::Buffer<char>>().Length();
+	entropyBlob.pbData = nullptr;
+	if (!info[1].IsNull()){
+		entropyBlob.pbData = reinterpret_cast<BYTE *>(info[1].As<Napi::Buffer<char>>().Data());
+		entropyBlob.cbData = info[1].As<Napi::Buffer<char>>().Length();
+	}
 
 	DATA_BLOB dataIn;
 	DATA_BLOB dataOut;
@@ -84,39 +89,35 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 	{
 		DWORD errorCode = GetLastError();
 		Napi::Error::New(env, "Decryption failed. Error code:" + errorCode).ThrowAsJavaScriptException();
-		return;
+		return env.Null();
 	}
 
 	// Copy and free the buffer
 	auto returnBuffer = Napi::Buffer<char>::Copy(env, reinterpret_cast<const char *>(dataOut.pbData), dataOut.cbData);
 	LocalFree(dataOut.pbData);
 
-	info.GetReturnValue().Set(returnBuffer);
+	return returnBuffer;
 }
 
 // public unsafe static byte[] Protect(byte[] userData, byte[] optionalEntropy, DataProtectionScope scope)
 Napi::Value protectData(const Napi::CallbackInfo &info)
 {
-	ProtectDataCommon(true, info);
+	return ProtectDataCommon(true, info);
 }
 
 // public unsafe static byte[] Unprotect(byte[] encryptedData, byte[] optionalEntropy, DataProtectionScope scope)
 Napi::Value unprotectData(const Napi::CallbackInfo &info)
 {
-	ProtectDataCommon(false, info);
+	return ProtectDataCommon(false, info);
 }
 
 Napi::Object init(Napi::Env env, Napi::Object exports)
 {
-	Napi::Object target(env, Napi::Object::New(env));
+	exports.Set(Napi::String::New(env, "protectData"), Napi::Function::New(env, protectData));
 
-	target.Set(Napi::String::New(env, "protectData"),
-			   Napi::GetFunction(Napi::Function::New(env, protectData)));
+	exports.Set(Napi::String::New(env, "unprotectData"), Napi::Function::New(env, unprotectData));
 
-	target.Set(Napi::String::New(env, "unprotectData"),
-			   Napi::GetFunction(Napi::Function::New(env, unprotectData)));
-
-	return target;
+	return exports;
 }
 
-NODE_API_MODULE(binding, init)
+NODE_API_MODULE(addon, init)
