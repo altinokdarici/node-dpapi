@@ -6,6 +6,8 @@
 
 void ProtectDataCommon(bool protect, const Napi::CallbackInfo& info)
 {
+	Napi::Env env = info.Env();
+	
 	if (info.Length() != 3) {
 		Napi::Error::New(env, "3 arguments are required").ThrowAsJavaScriptException();
 	}
