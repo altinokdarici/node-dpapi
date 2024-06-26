@@ -1,6 +1,6 @@
 {
   "name": "node-dpapi-prebuilt",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node native module to encrypt/decrypt data. On Windows, it uses DPAPI",
   "main": "index.js",
   "types": "index.d.ts",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/altinokdarici/node-dpapi.git"
   },
-  "dependencies": {
+  "devdependencies": {
     "node-addon-api": "^8.0.0"
   }
 }
