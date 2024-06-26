@@ -88,7 +88,7 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 	}
 
 	// Copy and free the buffer
-	auto returnBuffer = Napi::Buffer::Copy(env, reinterpret_cast<const char *>(dataOut.pbData), dataOut.cbData);
+	auto returnBuffer = Napi::Buffer<char>::Copy(env, reinterpret_cast<const char *>(dataOut.pbData), dataOut.cbData);
 	LocalFree(dataOut.pbData);
 
 	info.GetReturnValue().Set(returnBuffer);
