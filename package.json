@@ -19,7 +19,7 @@
     "type": "git",
     "url": "git+https://github.com/altinokdarici/node-dpapi.git"
   },
-  "devdependencies": {
+  "devDependencies": {
     "node-addon-api": "^8.0.0"
   }
 }
