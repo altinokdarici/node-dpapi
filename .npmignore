@@ -1,6 +1,5 @@
 .vscode/
-build/**
-!build/**/*.node
+build/
 .github/
 binding.gyp
 src/

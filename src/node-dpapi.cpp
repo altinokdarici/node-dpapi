@@ -3,8 +3,6 @@
 #include <Windows.h>
 #include <dpapi.h>
 #include <functional>
-#include <iostream> // Include for std::cout
-
 
 Napi::Value ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 {
