@@ -11,24 +11,25 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 	if (info.Length() != 3)
 	{
 		Napi::Error::New(env, "3 arguments are required").ThrowAsJavaScriptException();
+		return;
 	}
 
 	if (info[0].IsNull() || info[0].IsUndefined() || !info[0].IsTypedArray() || info[0].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
 	{
 		Napi::Error::New(env, "First argument, data, must be a valid Uint8Array").ThrowAsJavaScriptException();
-		return env.Null();
+		return;
 	}
 
 	if (info[1].IsNull() || info[1].IsUndefined() || !info[1].IsTypedArray() || info[1].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
 	{
 		Napi::Error::New(env, "Second argument, optionalEntropy, must be null or an ArrayBuffer").ThrowAsJavaScriptException();
-		return env.Null();
+		return;
 	}
 
 	if (info[2].IsNull() || info[2].IsUndefined() || !info[2].IsTypedArray() || info[2].As<Napi::TypedArray>().TypedArrayType() != napi_uint8_array)
 	{
 		Napi::Error::New(env, "Third argument, scope, must be a string").ThrowAsJavaScriptException();
-		return env.Null();
+		return;
 	}
 
 	DWORD flags = 0;
@@ -90,14 +91,14 @@ void ProtectDataCommon(bool protect, const Napi::CallbackInfo &info)
 	{
 		DWORD errorCode = GetLastError();
 		Napi::Error::New(env, "Decryption failed. Error code:" + errorCode).ThrowAsJavaScriptException();
-		return env.Null();
+		return;
 	}
 
 	// Copy and free the buffer
 	auto returnBuffer = Napi::Buffer::Copy(env, reinterpret_cast<const char *>(dataOut.pbData), dataOut.cbData);
 	LocalFree(dataOut.pbData);
 
-	return returnBuffer;
+	info.GetReturnValue().Set(returnBuffer);
 }
 
 // public unsafe static byte[] Protect(byte[] userData, byte[] optionalEntropy, DataProtectionScope scope)
