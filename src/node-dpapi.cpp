@@ -1,5 +1,4 @@
 #include <napi.h>
-#include <uv.h>
 #include <Windows.h>
 #include <dpapi.h>
 #include <functional>
